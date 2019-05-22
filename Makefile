@@ -6,8 +6,12 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 BINARY_NAME=bin/gopress
 CMD_DIR=cmd/gopress/*
+INSTALLBINDIR := /usr/local/bin
+ 
+.PHONY: install test
 
-all: test build
+all: clean test build install
+
 build: 
 	$(GOBUILD) -o $(BINARY_NAME) -v $(CMD_DIR)
 test: 
@@ -19,3 +23,6 @@ clean:
 run:
 	$(GOBUILD) -o $(BINARY_NAME) -v $(CMD_DIR)
 	./$(BINARY_NAME)
+
+install:
+	cp ./$(BINARY_NAME) $(INSTALLBINDIR)
