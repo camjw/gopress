@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	parser "github.com/camjw/gopress/internal/parser"
 )
@@ -34,12 +36,33 @@ func checkRegexesAgainstChanges(changes []byte, regexes []string) bool {
 	return false
 }
 
-func runCypressTests(specs []string) {
-	cmdName := "npx"
-	fmt.Println(specs)
-	_, err := exec.Command(cmdName, specs...).Output()
+func runCypressTests(specsToRun []string) {
+	specPath := strings.Join(specsToRun, ",")
+	cmd := exec.Command("npx", "cypress", "run", "--spec", specPath)
+
+	cmdReader, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
+		return
+	}
+
+	scanner := bufio.NewScanner(cmdReader)
+	go func() {
+		for scanner.Scan() {
+			fmt.Printf("%s\n", scanner.Text())
+		}
+	}()
+
+	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error running cypress: ", err)
+		return
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "There was an error running cypress: ", err)
+		return
 	}
 }
 
@@ -50,15 +73,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	var specsToRun []string
 	testcases := config.Tests
 	fileBytes := getFileChanges(config.Basebranch)
-
-	specsToRun := []string{"cypress", "run", "--specs"}
 
 	for testIdx, _ := range testcases {
 		testcase := testcases[testIdx]
 		if checkRegexesAgainstChanges(fileBytes, testcase.Regexes) {
-			specsToRun = append(specsToRun, config.Directory+testcase.Testfile+config.Extension)
+			specsToRun = append(specsToRun, config.GetFilePath(testcase))
 		}
 	}
 

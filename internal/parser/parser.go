@@ -10,22 +10,26 @@ type Testcase struct {
 	Regexes  []string `json:"regexes"`
 }
 
-type GopressConfig struct {
+type Config struct {
 	Directory  string     `json:"directory"`
 	Extension  string     `json:"extension"`
 	Basebranch string     `json:"basebranch"`
 	Tests      []Testcase `json:"tests"`
 }
 
-func GetConfig() (GopressConfig, error) {
+func GetConfig() (Config, error) {
 	configFile, err := ioutil.ReadFile("./gopress.json")
 	if err != nil {
-		return GopressConfig{}, err
+		return Config{}, err
 	}
-	var config GopressConfig
+	var config Config
 	err = json.Unmarshal(configFile, &config)
 	if err != nil {
-		return GopressConfig{}, err
+		return Config{}, err
 	}
 	return config, nil
+}
+
+func (c *Config) GetFilePath(t Testcase) string {
+	return c.Directory + t.Testfile + c.Extension
 }
