@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -8,7 +9,7 @@ import (
 	scripts "github.com/camjw/gopress/internal/scripts"
 )
 
-func main() {
+func runGopress() {
 	config, err := parser.GetConfig()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error parsing the goparser json: ", err)
@@ -27,4 +28,16 @@ func main() {
 	}
 
 	scripts.RunCypressTests(specsToRun)
+}
+
+func main() {
+	versionFlag := flag.Bool("version", false, "Check the version of Gopress")
+
+	flag.Parse()
+
+	if *versionFlag {
+		fmt.Println("v.0.0-alpha")
+	} else {
+		runGopress()
+	}
 }
