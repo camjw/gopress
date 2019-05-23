@@ -27,7 +27,11 @@ func runGopress() {
 		}
 	}
 
-	scripts.RunCypressTests(specsToRun)
+	if len(specsToRun) > 0 {
+		scripts.RunCypressTests(specsToRun)
+	} else {
+		fmt.Println("No specs to run")
+	}
 }
 
 func main() {
