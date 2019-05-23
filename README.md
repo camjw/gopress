@@ -4,11 +4,13 @@ Run cypress tests - but not all at once!
 
 ## Installation
 
-The easiest way is to use Homebrew:
+A bit involved. First you must install Go:
 ```
-brew install gopress
+brew install go
 ```
-Alternatively, you can clone this repo and then run `Make` from the root to install.
+Next, clone this repo into your `GOPATH` and then run `Make` from the root to install.
+
+I will be adding this to homebrew to make it a bit easier to use.
 
 ## Usage
 
