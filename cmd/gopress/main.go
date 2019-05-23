@@ -1,43 +1,23 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
+
+	parser "github.com/camjw/gopress/internal/parser"
 )
 
-type testRegex struct {
-	Filename string   `json:"filename"`
-	Regexes  []string `json:"regexes"`
-}
-
-func getFileChanges() []byte {
+func getFileChanges(basebranch string) []byte {
 	cmdName := "git"
-	cmdArgs := []string{"diff", "--name-only", "HEAD^", "HEAD"}
+	cmdArgs := []string{"diff", "--name-only", basebranch, "HEAD"}
 	cmdResponse, err := exec.Command(cmdName, cmdArgs...).Output()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error running git diff command: ", err)
 		os.Exit(1)
 	}
 	return cmdResponse
-}
-
-func getTestRegexes(filename string) []testRegex {
-	regexesFile, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "There was an error reading the features json: ", err)
-		os.Exit(1)
-	}
-	var testRegexes []testRegex
-	err = json.Unmarshal(regexesFile, &testRegexes)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "The test regexes json could not be read: ", err)
-		os.Exit(1)
-	}
-	return testRegexes
 }
 
 func checkRegexesAgainstChanges(changes []byte, regexes []string) bool {
@@ -64,16 +44,21 @@ func runCypressTests(specs []string) {
 }
 
 func main() {
+	config, err := parser.GetConfig()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "There was an error parsing the goparser json: ", err)
+		os.Exit(1)
+	}
 
-	testRegexes := getTestRegexes("./cypress/features.json")
-	fileBytes := getFileChanges()
+	testcases := config.Tests
+	fileBytes := getFileChanges(config.Basebranch)
 
 	specsToRun := []string{"cypress", "run", "--specs"}
 
-	for regexIdx, _ := range testRegexes {
-		testRegex := testRegexes[regexIdx]
-		if checkRegexesAgainstChanges(fileBytes, testRegex.Regexes) {
-			specsToRun = append(specsToRun, testRegex.Filename)
+	for testIdx, _ := range testcases {
+		testcase := testcases[testIdx]
+		if checkRegexesAgainstChanges(fileBytes, testcase.Regexes) {
+			specsToRun = append(specsToRun, config.Directory+testcase.Testfile+config.Extension)
 		}
 	}
 
