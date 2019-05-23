@@ -23,7 +23,7 @@ Create a `gopress.json` file at the root of the repo with the following structur
 		{
 			"testfile": "the name of your test file i.e. account_page",
 			"regexes": [
-				"a regexp which matches the files which you want to trigger a retesting"
+				"a regexp matching files which should trigger a retesting"
 			]
 		},
 		.
