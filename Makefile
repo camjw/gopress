@@ -8,14 +8,12 @@ BINARY_NAME=bin/gopress
 CMD_DIR=cmd/gopress/*
 INSTALLBINDIR := /usr/local/bin
  
-.PHONY: install test
+.PHONY: install
 
-all: clean test build install
+all: clean build install
 
 build: 
 	$(GOBUILD) -o $(BINARY_NAME) -v $(CMD_DIR)
-test: 
-	$(GOTEST) -v ./...
 clean: 
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
