@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	parser "github.com/camjw/gopress/internal/parser"
-	scripts "github.com/camjw/gopress/internal/scripts"
+	parser "gopress/internal/parser"
+	scripts "gopress/internal/scripts"
 )
 
 func runGopress() {
