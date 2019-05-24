@@ -4,13 +4,13 @@ Run cypress tests - but not all at once!
 
 ## Installation
 
-A bit involved. First you must install Go:
+This project requires Go and Go modules to be enabled:
 ```
 brew install go
+echo 'export GO111MODULES=on' >>~/.bash_profile
+source ~/.bash_profile
 ```
-Next, clone this repo into your `GOPATH` and then run `Make` from the root to install.
-
-I will be adding this to homebrew to make it a bit easier to use.
+Next, clone this repo and then run `make` from the root of the repo to install.
 
 ## Usage
 
@@ -25,7 +25,9 @@ Create a `gopress.json` file at the root of the repo with the following structur
 		{
 			"testfile": "the name of your test file i.e. account_page",
 			"regexes": [
-				"a regexp matching files which should trigger a retesting"
+				"a regexp matching files which should trigger a retesting",
+				.
+				.
 			]
 		},
 		.
@@ -36,6 +38,8 @@ Create a `gopress.json` file at the root of the repo with the following structur
 ```
 
 then just run `gopress` in the command line to run all of the matching tests.
+
+You can add more than one regexp, just so that you don't have to write long gnarly rexexps.
 
 ## Improvements
 
