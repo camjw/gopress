@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 
 	parser "gopress/internal/parser"
 	scripts "gopress/internal/scripts"
 )
 
-func runGopress() {
-	config, err := parser.GetConfig()
+func runGopress(file io.Reader) {
+	config, err := parser.GetConfig(file)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "There was an error parsing the goparser json: ", err)
 		os.Exit(1)
@@ -41,7 +42,14 @@ func main() {
 
 	if *versionFlag {
 		fmt.Println("v.0.0-alpha")
-	} else {
-		runGopress()
+		return
 	}
+
+	file, err := os.Open("./gopress.json")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "There was an error loading the gopress file: ", err)
+		os.Exit(1)
+	}
+
+	runGopress(file)
 }

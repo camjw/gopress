@@ -2,7 +2,8 @@ package parser
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"io"
 )
 
 type Testcase struct {
@@ -17,19 +18,24 @@ type Config struct {
 	Tests      []Testcase `json:"tests"`
 }
 
-func GetConfig() (Config, error) {
-	configFile, err := ioutil.ReadFile("./gopress.json")
-	if err != nil {
-		return Config{}, err
-	}
+func GetConfig(r io.Reader) (Config, error) {
 	var config Config
-	err = json.Unmarshal(configFile, &config)
+	err := json.NewDecoder(r).Decode(&config)
 	if err != nil {
+		fmt.Println(err)
 		return Config{}, err
 	}
+	config.cleanDirectory()
 	return config, nil
 }
 
 func (c *Config) GetFilePath(t Testcase) string {
 	return c.Directory + t.Testfile + c.Extension
+}
+
+func (c *Config) cleanDirectory() {
+	trailing := c.Directory[len(c.Directory)-1:]
+	if trailing != "/" {
+		c.Directory = c.Directory + "/"
+	}
 }
