@@ -9,7 +9,10 @@ INSTALLBINDIR := /usr/local/bin
  
 .PHONY: install
 
-all: clean build install
+all: clean test build install
+
+test:
+	$(GOTEST) -v ./...
 
 build: 
 	$(GOBUILD) -o $(BINARY_NAME) $(CMD_DIR)
