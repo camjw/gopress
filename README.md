@@ -7,7 +7,7 @@ Run cypress tests - but not all at once!
 This project requires Go and Go modules to be enabled:
 ```
 brew install go
-echo 'export GO111MODULES=on' >>~/.bash_profile
+echo 'export GO111MODULES=on' >> ~/.bash_profile
 source ~/.bash_profile
 ```
 Next, clone this repo and then run `make` from the root of the repo to install.
