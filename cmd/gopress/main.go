@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -35,21 +36,33 @@ func runGopress(file io.Reader) {
 	}
 }
 
+func loadFile(filename string) (io.Reader, error) {
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, errors.New("There was an error loading the gopress file: " + err.Error())
+	}
+	return file, nil
+}
+
+func handleFlags(versionFlag *bool) {
+	if *versionFlag {
+		fmt.Println("v.0.0-alpha")
+		os.Exit(0)
+	}
+
+	file, err := loadFile("./gopress.json")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	runGopress(file)
+}
+
 func main() {
 	versionFlag := flag.Bool("version", false, "Check the version of Gopress")
 
 	flag.Parse()
 
-	if *versionFlag {
-		fmt.Println("v.0.0-alpha")
-		return
-	}
-
-	file, err := os.Open("./gopress.json")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "There was an error loading the gopress file: ", err)
-		os.Exit(1)
-	}
-
-	runGopress(file)
+	handleFlags(versionFlag)
 }
